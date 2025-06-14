@@ -1,0 +1,343 @@
+﻿@using InvoiceGenerator.InvoiceGenerator.Core.Models.Invoice
+@using InvoiceGenerator.InvoiceGenerator.Infrastructure.Models;
+@model IEnumerable<InvoiceServiceViewModel>
+
+@{
+    ViewData["Title"] = "My Invoices";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Invoices</li>
+        </ol>
+    </nav>
+
+    <!-- Toast Notification Placeholder -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 11;">
+        <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="successMessage"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="errorMessage"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Card Container -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2 class="h4 mb-0 text-dark fw-semibold">
+                        <i class="bi bi-receipt me-2 text-primary"></i>My Invoices
+                    </h2>
+                    <p class="text-muted mb-0 small">Manage and track your invoices</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="/Invoice/Create" class="btn btn-secondary btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i>New Invoice
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <!-- Search and Filter Section -->
+            <div class="p-4 bg-light border-bottom">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0 ps-0" id="searchInput"
+                                   placeholder="Search by Invoice Number or Client Name..." />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Unpaid">Unpaid</option>
+                            <option value="Overdue">Overdue</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-secondary w-100" id="clearFilters">
+                            <i class="bi bi-arrow-clockwise me-1"></i>Clear Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoices Table -->
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="invoicesTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 fw-semibold text-dark">
+                                <i class="bi bi-hash me-1"></i>Invoice Number
+                            </th>
+                            <th scope="col" class="px-4 py-3 fw-semibold text-dark">
+                                <i class="bi bi-person me-1"></i>Client
+                            </th>
+                            <th scope="col" class="px-4 py-3 fw-semibold text-dark">
+                                <i class="bi bi-calendar-event me-1"></i>Issue Date
+                            </th>
+                            <th scope="col" class="px-4 py-3 fw-semibold text-dark">
+                                <i class="bi bi-calendar-check me-1"></i>Due Date
+                            </th>
+                            <th scope="col" class="px-4 py-3 fw-semibold text-dark text-end">
+                                <i class="bi bi-currency-euro me-1"></i>Total
+                            </th>
+                            <th scope="col" class="px-4 py-3 fw-semibold text-dark text-center">
+                                <i class="bi bi-check-circle me-1"></i>Status
+                            </th>
+                            <th scope="col" class="px-4 py-3 fw-semibold text-dark text-center">
+                                <i class="bi bi-gear me-1"></i>Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var invoice in Model)
+                            {
+                                <tr class="border-bottom">
+                                    <td class="px-4 py-3">
+                                        <a href="/Invoice/Preview/@invoice.Id"
+                                           class="fw-semibold text-decoration-none"
+                                           style="
+                                               color: #4a00e0;
+                                               background: linear-gradient(90deg, #8e2de2, #4a00e0);
+                                               -webkit-background-clip: text;
+                                               -webkit-text-fill-color: transparent;
+                                               transition: all 0.3s ease-in-out;
+           "
+                                           onmouseover="this.style.opacity='0.8'"
+                                           onmouseout="this.style.opacity='1'">
+                                            #@invoice.InvoiceNumber
+                                        </a>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2"
+                                                 style="width: 32px; height: 32px;">
+                                                <i class="bi bi-person text-muted"></i>
+                                            </div>
+                                            <span class="text-dark">@invoice.ClientName</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 text-muted">
+                                        @invoice.IssueDate
+                                    </td>
+                                    <td class="px-4 py-3 text-muted">
+                                        @invoice.DueDate
+                                    </td>
+                                    <td class="px-4 py-3 text-end">
+                                        <span class="fw-semibold text-dark">€@invoice.Total.ToString("N2")</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-end">
+                                        <span class="fw-semibold text-dark">€@invoice.Status</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                <li>
+                                                    <form method="get" asp-controller="Pdf" asp-action="ExportInvoice" asp-route-id="@invoice.Id">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="dropdown-item" href="@Url.Action("ViewPdf", "Invoice", new { id = invoice.Id })">
+                                                            <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>Export PDF
+                                                        </button>
+                                                       </form>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="@Url.Action("Edit", "Invoice", new { id = invoice.Id })">
+                                                        <i class="bi bi-pencil me-2 text-primary"></i>Edit
+                                                    </a>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <form method="post" asp-action="Delete" asp-controller="Invoice" asp-route-id="@invoice.Id" onsubmit="return confirm('Are you sure?')">
+                                                        
+                                                        <button type=submit class="dropdown-item text-danger" href="#">
+                                                            <i class="bi bi-trash me-2"></i>Delete
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-inbox display-4 d-block mb-3 text-muted opacity-50"></i>
+                                        <h5 class="text-muted">No invoices found</h5>
+                                        <p class="mb-0">You haven't created any invoices yet.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (Model != null && Model.Any())
+            {
+                <div class="d-flex justify-content-between align-items-center p-4 border-top bg-light">
+                    <div class="text-muted small">
+                        Showing 1 to @Model.Count() of @Model.Count() entries
+                    </div>
+                    <nav aria-label="Invoice pagination">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                            </li>
+                            <li class="page-item active" aria-current="page">
+                                <a class="page-link" href="#">1</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">2</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">3</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    .table > :not(caption) > * > * {
+        border-bottom-width: 1px;
+        border-color: #e9ecef;
+        vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.15s ease-in-out;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .input-group-text {
+        border-color: #ced4da;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: ">";
+        color: #6c757d;
+    }
+</style>
+
+<!-- JavaScript for Search and Filtering -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const clearFiltersBtn = document.getElementById('clearFilters');
+        const tableRows = document.querySelectorAll('#invoicesTable tbody tr');
+
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const statusValue = statusFilter.value;
+
+            tableRows.forEach(row => {
+                if (row.cells.length === 1) return; // Skip "no data" row
+
+                const invoiceNumber = row.cells[0].textContent.toLowerCase();
+                const clientName = row.cells[1].textContent.toLowerCase();
+                const status = row.cells[5].textContent.trim();
+
+                const matchesSearch = invoiceNumber.includes(searchTerm) || clientName.includes(searchTerm);
+                const matchesStatus = !statusValue || status.includes(statusValue);
+
+                row.style.display = matchesSearch && matchesStatus ? '' : 'none';
+            });
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        statusFilter.addEventListener('change', filterTable);
+
+        clearFiltersBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            statusFilter.value = '';
+            filterTable();
+        });
+    });
+
+    function deleteInvoice(invoiceId) {
+        if (confirm('Are you sure you want to delete this invoice? This action cannot be undone.')) {
+            // Add your delete logic here
+            console.log('Deleting invoice:', invoiceId);
+            showToast('Invoice deleted successfully!', 'success');
+        }
+    }
+
+    function showToast(message, type) {
+        const toastElement = type === 'success' ?
+            document.getElementById('successToast') :
+            document.getElementById('errorToast');
+        const messageElement = type === 'success' ?
+            document.getElementById('successMessage') :
+            document.getElementById('errorMessage');
+
+        messageElement.textContent = message;
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+    }
+</script>

@@ -1,0 +1,810 @@
+﻿@using InvoiceGenerator.InvoiceGenerator.Core.Models.Invoice
+@model InvoiceServiceViewModel
+
+
+@{
+    ViewData["Title"] = "Edit Invoice";
+    var isEdit = true;
+}
+
+<style>
+    .invoice-container {
+        padding: 2rem;
+        background-color: #fdfdfd;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    .invoice-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+        .invoice-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .form-group {
+        flex: 1 1 100%;
+        min-width: 250px;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-field {
+        position: relative;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+        .input-field input,
+        .input-field textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+            background-color: #fff;
+        }
+
+            .input-field input:focus,
+            .input-field textarea:focus {
+                border-color: #444;
+                outline: none;
+            }
+
+        .input-field label {
+            position: absolute;
+            top: -0.65rem;
+            left: 1rem;
+            background: #fdfdfd;
+            padding: 0 0.25rem;
+            font-size: 0.85rem;
+            color: #444;
+            z-index: 1;
+        }
+
+    .invoice-section {
+        margin-top: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+        .section-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+    .add-item-button {
+        background-color: #222;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        transition: background-color 0.3s;
+    }
+
+        .add-item-button:hover {
+            background-color: #000;
+        }
+
+    .line-items-header,
+    .line-item {
+        display: flex;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        align-items: center;
+    }
+
+        .line-item .input-field {
+            margin-bottom: 0;
+        }
+
+    .line-total {
+        font-weight: 600;
+    }
+
+    .invoice-summary {
+        margin-top: 2rem;
+        padding: 1rem;
+        border-top: 1px solid #ddd;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+    }
+
+    .invoice-actions {
+        position: relative;
+        z-index: 10;
+        margin-top: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 1rem;
+        background-color: #fdfdfd;
+        padding: 1rem;
+        border-top: 1px solid #ddd;
+    }
+
+    .action-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: background-color 0.3s;
+    }
+
+    .cancel-button {
+        background-color: #eee;
+        color: #333;
+    }
+
+        .cancel-button:hover {
+            background-color: #ddd;
+        }
+
+    .primary-button {
+        background-color: #111;
+        color: #fff;
+    }
+
+        .primary-button:hover {
+            background-color: #000;
+        }
+
+    .remove-item-button {
+        background: none;
+        border: none;
+        color: #dc3545;
+        font-size: 1.2rem;
+    }
+
+    @@media (max-width: 768px) {
+        .line-items-header, .line-item
+
+    {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto auto;
+    }
+
+    .line-item > div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .line-item label {
+        margin-bottom: 0.25rem;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .invoice-actions {
+        justify-content: center;
+    }
+
+    }
+
+    @@media (max-width: 400px) {
+        .form-row
+
+    {
+        flex-direction: column;
+    }
+
+    .line-items-header,
+    .line-item {
+        grid-template-columns: 1fr;
+    }
+
+        .line-item label {
+            margin-bottom: 0.25rem;
+        }
+
+    }
+
+    @@media (max-width: 400px) {
+        .form-row
+
+    {
+        flex-direction: column;
+        gap: 1rem; /* Add this for space between fields */
+    }
+
+    .line-items-header,
+    .line-item {
+        grid-template-columns: 1fr;
+        gap: 0.75rem; /* Add spacing between items */
+    }
+
+    .input-field input,
+    .input-field textarea {
+        font-size: 0.95rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .input-field label {
+        font-size: 0.75rem;
+    }
+
+    .section-header h3 {
+        font-size: 1.1rem;
+    }
+
+    }
+</style>
+    
+
+<div class="invoice-container">
+    <div class="invoice-header">
+        <h2><i class="bi bi-pencil-square me-3"></i>Edit Invoice</h2>
+        <p>Modify the details below to update your invoice with enhanced styling and user experience</p>
+    </div>
+
+    <div class="form-container">
+        <div class="form-content">
+            <form id="invoiceForm" asp-controller="Invoice" asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <!-- Company Information Section -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="input-field">
+                            <input asp-for="CompanyName" placeholder=" " />
+                            <label asp-for="CompanyName">Company Name</label>
+                            <span asp-validation-for="CompanyName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-field">
+                            <input asp-for="CompanyAddress" placeholder=" " />
+                            <label asp-for="CompanyAddress">Company Address</label>
+                            <span asp-validation-for="CompanyAddress" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Details Section -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="input-field">
+                            <input asp-for="InvoiceNumber" placeholder=" " disabled/>
+                            <label asp-for="InvoiceNumber">Invoice Number</label>
+                            <span asp-validation-for="InvoiceNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-field">
+                            <input asp-for="IssueDate" type="date" placeholder=" " />
+                            <label asp-for="IssueDate">Invoice Date</label>
+                            <span asp-validation-for="IssueDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-field">
+                            <input asp-for="DueDate" type="date" placeholder=" " />
+                            <label asp-for="DueDate">Due Date</label>
+                            <span asp-validation-for="DueDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Information Section -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="input-field">
+                            <input asp-for="ClientName" placeholder=" " />
+                            <label asp-for="ClientName">Client Name</label>
+                            <span asp-validation-for="ClientName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-field">
+                            <input asp-for="ClientEmail" type="email" placeholder=" " />
+                            <label asp-for="ClientEmail">Client Email</label>
+                            <span asp-validation-for="ClientEmail" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-field">
+                        <textarea asp-for="ClientAddress" rows="3" placeholder=" "></textarea>
+                        <label asp-for="ClientAddress">Client Address</label>
+                        <span asp-validation-for="ClientAddress" class="text-danger"></span>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Line Items Section -->
+        <div class="invoice-section">
+            <div class="section-header">
+                <h3><i class="bi bi-list-check"></i>Invoice Items</h3>
+                <button type="button" id="addLineItemBtn" class="add-item-button">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>Add New Item</span>
+                </button>
+            </div>
+
+            <div class="line-items-table">
+                <div id="lineItemsContainer">
+                    @for (int i = 0; i < Model.InvoiceItems.Count; i++)
+                    {
+                        <div class="line-item" data-index="@i">
+                            <div class="item-description">
+                                <div class="input-field">
+                                    <input type="text" name="LineItems[@i].Description" value="@Model.InvoiceItems[i].Description" placeholder="@Model.InvoiceItems[i].Description" />
+                                    <label>Item Description</label>
+                                </div>
+                            </div>
+                            <div class="item-quantity">
+                                <div class="input-field">
+                                    <input name="LineItems[@i].Quantity" value="@Model.InvoiceItems[i].Quantity" min="1" step="1" placeholder="@Model.InvoiceItems[i].Quantity" />
+                                    <label>Qty</label>
+                                </div>
+                            </div>
+                            <div class="item-unit-price">
+                                <div class="input-field">
+                                    <input name="LineItems[@i].UnitPrice" value="@Model.InvoiceItems[i].Price"  step="0.01" />
+                                    <label>Price</label>
+                                </div>
+                            </div>
+                            <div class="item-tax">
+                                <div class="input-field">
+                                    <input name="LineItems[@i].Tax" value="20" step="0.01" min="0" max="100" placeholder=" " disabled/>
+                                    <label>Tax %</label>
+                                </div>
+                            </div>
+                            <div class="item-total">
+                                <div class="line-total">&#8356;@((Model.InvoiceItems[i].Total * 1.2m).ToString("F2"))</div>
+                            </div>
+                            <div class="item-actions">
+                                <button type="button" class="remove-item-button" title="Remove Item">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Summary -->
+        <div class="invoice-summary">
+            <div class="summary-row">
+                <span class="summary-label">Subtotal:</span>
+                <span class="summary-value" id="subtotalAmount">&#8356;@Model.Subtotal.ToString("F2") (No Tax)</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Tax:</span>
+                <span class="summary-value" id="taxAmount">&#8356;@Model.Tax.ToString("F2")</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Total Amount:</span>
+                <span class="summary-value" id="totalAmount">&#8356;@Model.Total.ToString("F2")</span>
+            </div>
+        </div>
+
+
+        <!-- Action Buttons -->
+        <div class="invoice-actions">
+            <a href="/Invoice/All" class="action-button cancel-button">
+                <i class="bi bi-x-circle"></i>
+                <span>Cancel</span>
+            </a>
+            <button type="submit" form="invoiceForm" class="action-button primary-button" id="edit-btn">
+                <i class="bi bi-check-circle"></i>
+                <span>Update Invoice</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+
+        class InvoiceManager {
+            constructor() {
+                this.items = [...document.querySelectorAll('#lineItemsContainer > div')]; // get all elements here
+                this.lineItemIndex = 0;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+               
+                this.calculateTotals();
+            }
+
+            bindEvents() {
+                // Add new line item button
+                document.getElementById('addLineItemBtn').addEventListener('click', () => {
+                    this.addLineItem();
+                });
+
+                // Form submission
+                document.getElementById('invoiceForm').addEventListener('submit', (e) => {
+                    this.handleFormSubmit(e);
+                });
+
+                // Delegate events for dynamic content
+                document.getElementById('lineItemsContainer').addEventListener('click', (e) => {
+                    if (e.target.closest('.remove-item-button')) {
+                        this.removeLineItem(e.target.closest('.line-item'));
+                    }
+                });
+
+                document.getElementById('lineItemsContainer').addEventListener('input', (e) => {
+                    if (e.target.matches('input[type="number"]')) {
+                        this.calculateLineItemTotal(e.target.closest('.line-item'));
+                        this.calculateTotals();
+                    }
+                });
+            }
+
+            addSampleLineItems() {
+                // Add sample data
+                const sampleItems = [
+                    { description: 'Web Development Services', quantity: 40, price: 75.00, tax: 20 },
+                    { description: 'Logo Design', quantity: 1, price: 500.00, tax: 20 },
+                    { description: 'Monthly Maintenance', quantity: 3, price: 150.00, tax: 20 }
+                ];
+
+                sampleItems.forEach(item => {
+                    this.addLineItem(item);
+                });
+            }
+
+            addLineItem(data = {}) {
+                const container = document.getElementById('lineItemsContainer');
+                const lineItem = document.createElement('div');
+                lineItem.className = 'line-item';
+                lineItem.setAttribute('data-index', this.lineItemIndex);
+
+                const description = data.description || '';
+                const quantity = data.quantity || 1;
+                const price = data.price || 0;
+                const tax = data.tax || 20;
+
+                lineItem.innerHTML = `
+                    <div class="item-description">
+                        <div class="input-field">
+                            <input type="text" name="LineItems[${this.lineItemIndex}].Description" value="${description}" placeholder=" " />
+                            <label>Item Description</label>
+                        </div>
+                    </div>
+                    <div class="item-quantity">
+                        <div class="input-field">
+                            <input type="number" name="LineItems[${this.lineItemIndex}].Quantity" value="${quantity}" min="1" step="1" placeholder=" " />
+                            <label>Qty</label>
+                        </div>
+                    </div>
+                    <div class="item-unit-price">
+                        <div class="input-field">
+                            <input type="number" name="LineItems[${this.lineItemIndex}].UnitPrice" value="${price}" step="0.01" placeholder=" " />
+                            <label>Price</label>
+                        </div>
+                    </div>
+                    <div class="item-tax">
+                        <div class="input-field">
+                            <input disabled type="text" name="LineItems[${this.lineItemIndex}].Tax" value="${tax}" step="0.01" min="0" max="100" placeholder=" " />
+                            <label>Tax %</label>
+                        </div>
+                    </div>
+                    <div class="item-total">
+                        <div class="line-total">&#8356;0.00</div>
+                    </div>
+                    <div class="item-actions">
+                        <button type="button" class="remove-item-button" title="Remove Item">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(lineItem);
+                this.items.push(lineItem)
+                this.lineItemIndex++;
+
+
+                console.log(this.items);
+
+                // Calculate total for this line item
+                this.calculateLineItemTotal(lineItem);
+
+                // Add animation
+                lineItem.style.opacity = '0';
+                lineItem.style.transform = 'translateY(-20px)';
+                setTimeout(() => {
+                    lineItem.style.transition = 'all 0.3s ease';
+                    lineItem.style.opacity = '1';
+                    lineItem.style.transform = 'translateY(0)';
+                }, 10);
+            }
+
+            removeLineItem(lineItem) {
+                   
+                this.items.pop();
+
+                console.log(this.items);
+
+                lineItem.style.transition = 'all 0.3s ease';
+                lineItem.style.opacity = '0';
+                lineItem.style.transform = 'translateX(-100%)';
+                setTimeout(() => {
+                    lineItem.remove();
+                    this.calculateTotals();
+                    this.reindexLineItems();
+                }, 300);
+            }
+
+            reindexLineItems() {
+                const lineItems = document.querySelectorAll('.line-item');
+                lineItems.forEach((item, index) => {
+                    item.setAttribute('data-index', index);
+                    const inputs = item.querySelectorAll('input');
+                    inputs.forEach(input => {
+                        const name = input.getAttribute('name');
+                        if (name && name.includes('LineItems[')) {
+                            const newName = name.replace(/LineItems\[\d+\]/, `LineItems[${index}]`);
+                            input.setAttribute('name', newName);
+                        }
+                    });
+                });
+            }
+
+           attachLineItemListeners(lineItem) {
+                const quantityInput = lineItem.querySelector('input[name*="Quantity"]');
+                const priceInput = lineItem.querySelector('input[name*="UnitPrice"]');
+
+                if (quantityInput && priceInput) {
+                    quantityInput.addEventListener('input', () => this.calculateLineItemTotal(lineItem));
+                    priceInput.addEventListener('input', () => this.calculateLineItemTotal(lineItem));
+                }
+            }
+
+            calculateLineItemTotal(lineItem) {
+                const quantityInput = lineItem.querySelector('input[name*="Quantity"]');
+                const priceInput = lineItem.querySelector('input[name*="UnitPrice"]');
+                const taxInput = lineItem.querySelector('input[name*="Tax"]');
+                const totalDisplay = lineItem.querySelector('.line-total');
+
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const price = parseFloat(priceInput.value) || 0;
+                const taxRate = parseFloat(taxInput.value) || 0;
+
+                const subtotal = quantity * price;
+                const taxAmount = subtotal * (taxRate / 100);
+                const total = subtotal + taxAmount;
+
+                totalDisplay.textContent = this.formatCurrency(total);
+
+                this.calculateTotals();
+            }
+
+            calculateTotals() {
+                let subtotal = 0;
+                let totalTax = 0;
+
+                document.querySelectorAll('.line-item').forEach(item => {
+                    const quantityInput = item.querySelector('input[name*="Quantity"]');
+                    const priceInput = item.querySelector('input[name*="UnitPrice"]');
+                    const taxInput = item.querySelector('input[name*="Tax"]');
+
+                    const quantity = parseFloat(quantityInput.value) || 0;
+                    const price = parseFloat(priceInput.value) || 0;
+                    const taxRate = parseFloat(taxInput.value) || 0;
+
+                    const itemSubtotal = quantity * price;
+                    const itemTax = itemSubtotal * (taxRate / 100);
+
+                    subtotal += itemSubtotal;
+                    totalTax += itemTax;
+                });
+
+                const total = subtotal + totalTax;
+
+                document.getElementById('subtotalAmount').textContent = this.formatCurrency(subtotal);
+                document.getElementById('taxAmount').textContent = this.formatCurrency(totalTax);
+                document.getElementById('totalAmount').textContent = this.formatCurrency(total);
+            }
+
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD'
+                }).format(amount);
+            }
+
+            handleFormSubmit(e) {
+                e.preventDefault();
+
+                // Basic validation
+                const requiredFields = [
+                    'CompanyName',
+                    'InvoiceNumber',
+                    'IssueDate',
+                    'DueDate',
+                    'ClientName'
+                ];
+
+                let isValid = true;
+                const formData = new FormData(e.target);
+
+                requiredFields.forEach(fieldName => {
+                    const field = document.querySelector(`input[name="${fieldName}"]`);
+                    const errorSpan = field.parentElement.querySelector('.text-danger');
+
+                    if (!formData.get(fieldName) || formData.get(fieldName).trim() === '') {
+                        errorSpan.textContent = 'This field is required';
+                        field.style.borderColor = '#e74c3c';
+                        isValid = false;
+                    } else {
+                        errorSpan.textContent = '';
+                        field.style.borderColor = '#e1e5e9';
+                    }
+                });
+
+                // Validate line items
+                const lineItems = document.querySelectorAll('.line-item');
+                if (lineItems.length === 0) {
+                    alert('Please add at least one invoice item.');
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    // Show success message
+                    const submitBtn = document.getElementById('edit-btn');
+                    const originalText = submitBtn.innerHTML;
+
+                    submitBtn.innerHTML = '<i class="bi bi-check-circle"></i><span>Updating...</span>';
+                    submitBtn.disabled = true;
+
+                    // Simulate form submission
+                    setTimeout(() => {
+                        alert('Invoice updated successfully!');
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }, 2000);
+                }
+            }
+        }
+
+        let invoiceManager;
+        // Initialize the invoice manager when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            invoiceManager = new InvoiceManager();
+
+            document.querySelectorAll('.line-item').forEach(lineItem => {
+                invoiceManager.attachLineItemListeners(lineItem);
+                    
+            });
+        });
+
+
+
+        // Enhanced input field animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('.input-field input, .input-field textarea');
+
+            inputs.forEach(input => {
+                // Check if field has value on load
+                if (input.value && input.value.trim() !== '') {
+                    input.classList.add('has-value');
+                }
+
+                input.addEventListener('blur', () => {
+                    if (input.value && input.value.trim() !== '') {
+                        input.classList.add('has-value');
+                    } else {
+                        input.classList.remove('has-value');
+                    }
+                });
+            });
+        });
+
+        document.getElementById('edit-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const urlParts = window.location.pathname.split('/');
+            const invoiceId = urlParts[urlParts.length - 1];
+
+            const invoiceData = {
+                companyName: document.querySelector('#CompanyName').value,
+                companyAddress: document.querySelector('#CompanyAddress').value,
+                issueDate: document.querySelector('#IssueDate').value,
+                dueDate: document.querySelector('#DueDate').value,
+                clientName: document.querySelector('#ClientName').value,
+                invoiceItemsList: [],
+                total: document.querySelector('#totalAmount').textContent.replace('$', ""),
+            }
+
+            console.log(invoiceManager.items);
+
+            invoiceManager.items.forEach(lineItem => {
+
+                const description = lineItem.querySelector('input[name$=".Description"]')?.value || "";
+                const quantity = parseFloat(lineItem.querySelector('input[name$=".Quantity"]')?.value.replace(",", ".") || 0);
+                const unitPrice = parseFloat(lineItem.querySelector('input[name$=".UnitPrice"]')?.value.replace(",", ".") || 0);
+                const tax = parseFloat(lineItem.querySelector('input[name$=".Tax"]')?.value.replace(",", ".") || 0);
+                const total = quantity * unitPrice * (1 + tax / 100);
+
+
+                invoiceData.invoiceItemsList.push({
+                    invoiceItemDescription: description,
+                    invoiceItemQuantity: quantity,
+                    invoiceItemUnitPrice: unitPrice,
+                    invoiceItemTax: tax,
+                    invoiceItemTotal: total.toFixed(2).replace(".", ","),
+                });
+
+            });
+
+    
+            const stringifiedJsonData = JSON.stringify(invoiceData);
+
+            fetch(`/Invoice/Edit/${invoiceId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json'},
+                body: stringifiedJsonData,
+            })
+             .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text); });
+                    }
+                    return response.json(); // or .text() depending on what your backend returns
+                })
+                .then(data => {
+                    // ✅ Success
+                    toastr.success("Invoice edited successfully");
+                    // Or redirect:
+                    window.location.href = "/Invoice/All";
+                })
+                .catch(error => {
+                    // ❌ Failed
+                    console.error("Error:", error);
+                    toastr.error("Something went wrong");
+                });
+
+        });
+
+
+    </script>
+
+
+}

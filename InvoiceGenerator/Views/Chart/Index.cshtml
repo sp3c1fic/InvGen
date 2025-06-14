@@ -1,0 +1,269 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                <div class="text-muted">
+                    <i class="fas fa-chart-line me-1"></i>
+                    Revenue Overview
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Chart Card -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="card-title mb-0 text-primary">
+                                <i class="fas fa-chart-area me-2"></i>
+                                Revenue Overview
+                            </h5>
+                            <p class="card-subtitle text-muted small mb-0 mt-1">
+                                Monthly revenue from paid invoices
+                            </p>
+                        </div>
+                        <div class="col-auto">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-download me-2"></i>Export Data</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-print me-2"></i>Print Chart</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container position-relative">
+                        <canvas id="revenueChart" width="400" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards Row -->
+    <div class="row mt-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-primary border-4 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Revenue
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalRevenue">
+                                $0
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-success border-4 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Average Monthly
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="avgRevenue">
+                                $0
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-info border-4 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Best Month
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="bestMonth">
+                                -
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-warning border-4 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Growth Trend
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="growthTrend">
+                                0%
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-arrow-up fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Font Awesome for icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the revenue data from ViewBag
+            const revenueData = @Html.Raw(ViewBag.MonthlyRevenueData ?? "[]");
+
+            // Extract labels and data for Chart.js
+            const labels = revenueData.map(item => item.month);
+            const amounts = revenueData.map(item => item.amount);
+
+            // Calculate summary statistics
+            const totalRevenue = amounts.reduce((sum, amount) => sum + amount, 0);
+            const avgRevenue = amounts.length > 0 ? totalRevenue / amounts.length : 0;
+            const maxAmount = Math.max(...amounts);
+            const bestMonthIndex = amounts.indexOf(maxAmount);
+            const bestMonth = amounts.length > 0 ? labels[bestMonthIndex] : '-';
+
+            // Calculate growth trend (last month vs first month)
+            let growthTrend = 0;
+            if (amounts.length >= 2) {
+                const firstMonth = amounts[0];
+                const lastMonth = amounts[amounts.length - 1];
+                if (firstMonth > 0) {
+                    growthTrend = ((lastMonth - firstMonth) / firstMonth) * 100;
+                }
+            }
+
+            // Update summary cards
+            document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toLocaleString();
+            document.getElementById('avgRevenue').textContent = '$' + Math.round(avgRevenue).toLocaleString();
+            document.getElementById('bestMonth').textContent = bestMonth;
+            document.getElementById('growthTrend').textContent = (growthTrend >= 0 ? '+' : '') + growthTrend.toFixed(1) + '%';
+
+            // Update growth trend icon and color
+            const growthElement = document.getElementById('growthTrend');
+            const growthIcon = growthElement.parentElement.parentElement.querySelector('.fa-arrow-up');
+            if (growthTrend >= 0) {
+                growthIcon.className = 'fas fa-arrow-up fa-2x text-success';
+                growthElement.classList.add('text-success');
+            } else {
+                growthIcon.className = 'fas fa-arrow-down fa-2x text-danger';
+                growthElement.classList.add('text-danger');
+            }
+
+            // Chart.js configuration
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+
+            // Create gradient for the chart
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(54, 162, 235, 0.4)');
+            gradient.addColorStop(1, 'rgba(54, 162, 235, 0.1)');
+
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Monthly Revenue',
+                        data: amounts,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgb(54, 162, 235)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Revenue: $' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            hoverBackgroundColor: 'rgb(54, 162, 235)'
+                        }
+                    }
+                }
+            });
+
+            // Add animation on load
+            chart.update('active');
+        });
+    </script>
+}

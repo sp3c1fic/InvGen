@@ -1,0 +1,36 @@
+﻿@using InvoiceGenerator.InvoiceGenerator.Core.Models.Invoice
+<!-- Send Invoice Modal -->
+@model InvoiceServiceViewModel
+<div class="modal fade" id="sendInvoiceModal" tabindex="-1" aria-labelledby="sendInvoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="sendInvoiceModalLabel">Send Invoice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form method="post" asp-controller="Invoice" asp-action="Send" asp-route-id="@Model.Id">
+                <div class="modal-body">
+                    <p class="mb-3">You're about to send <strong>Invoice #@Model.InvoiceNumber</strong> to the client.</p>
+
+                    <div class="mb-3">
+                        <label for="recipientEmail" class="form-label">Recipient Email</label>
+                        <input type="email" class="form-control" id="recipientEmail" name="RecipientEmail" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="emailMessage" class="form-label">Optional Message</label>
+                        <textarea class="form-control" id="emailMessage" name="Message" rows="3" placeholder="Add a message..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Send Invoice</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

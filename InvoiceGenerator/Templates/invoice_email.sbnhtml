@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Invoice #{{ invoice_number }}</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+  <table align="center" width="600" style="background-color: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+    <tr>
+      <td>
+        <h2 style="text-align:center; color: #333;">Invoice</h2>
+        <p><strong>Invoice #: </strong>{{ invoice_number }}</p>
+        <p><strong>Date: </strong>{{ invoice_date }}</p>
+        <p><strong>To: </strong>{{ client_name }} ({{ client_email }})</p>
+
+        <hr style="margin: 20px 0;" />
+
+        <table width="100%" cellpadding="10" cellspacing="0" style="border-collapse: collapse;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th align="left">Description</th>
+              <th align="right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ for item in items }}
+              <tr>
+                <td>{{ item.description }}</td>
+                <td align="right">{{ item.amount }}</td>
+              </tr>
+            {{ end }}
+          </tbody>
+          <tfoot>
+            <tr style="border-top: 2px solid #eee;">
+              <td align="right"><strong>Total:</strong></td>
+              <td align="right"><strong>{{ total }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <p style="margin-top: 30px; font-size: 14px; color: #555;">
+          Thank you for your business. If you have any questions, feel free to reply to this email.
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

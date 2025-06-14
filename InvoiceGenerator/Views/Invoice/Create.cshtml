@@ -1,0 +1,987 @@
+﻿@using InvoiceGenerator.InvoiceGenerator.Core.Models.Invoice
+@using InvoiceGenerator.InvoiceGenerator.Core.Services
+@model CreateInvoiceViewModel
+
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --primary-hover: #1d4ed8;
+        --primary-light: rgba(37, 99, 235, 0.1);
+        --secondary-color: #64748b;
+        --accent-color: #f97316;
+        --accent-hover: #ea580c;
+        --danger-color: #dc2626;
+        --danger-hover: #b91c1c;
+        --success-color: #16a34a;
+        --success-hover: #15803d;
+        --text-primary: #334155;
+        --text-secondary: #64748b;
+        --text-muted: #94a3b8;
+        --border-color: #e2e8f0;
+        --border-light: #f1f5f9;
+        --bg-color: #f8fafc;
+        --card-bg: #ffffff;
+        --input-bg: #f1f5f9;
+        --input-focus: #f8fafc;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --radius-sm: 0.25rem;
+        --radius-md: 0.375rem;
+        --radius-lg: 0.5rem;
+        --transition: all 0.3s ease;
+    }
+
+    .invoice-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        position: relative;
+        bottom: 35px;
+    }
+
+    .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-left h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .text-muted {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .action-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: var(--radius-md);
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .save-button {
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+    }
+
+        .save-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+    .export-button {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+        .export-button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+    .action-button:active {
+        transform: translateY(0);
+    }
+
+    .invoice-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .invoice-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background-color: var(--bg-color);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        position: relative;
+    }
+
+        .section-header i {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            margin-right: 0.75rem;
+        }
+
+        .section-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .half {
+        width: calc(50% - 0.5rem);
+    }
+
+    .third {
+        width: calc(33.333% - 0.667rem);
+    }
+
+    .input-wrapper {
+        position: relative;
+        height: 3rem;
+        border-radius: var(--radius-md);
+        background-color: white;
+        transition: var(--transition);
+        border: 1px solid var(--border-color);
+    }
+
+    .textarea-wrapper {
+        height: auto;
+    }
+
+    .input-wrapper:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    .input-field {
+        position: relative;
+        height: 100%;
+        width: 100%;
+    }
+
+        .input-field input,
+        .input-field textarea {
+            width: 100%;
+            height: 100%;
+            padding: 1.25rem 1rem 0.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            outline: none;
+        }
+
+        .input-field textarea {
+            padding-top: 1.5rem;
+            resize: vertical;
+            min-height: 5rem;
+        }
+
+        .input-field label {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            transition: var(--transition);
+            pointer-events: none;
+        }
+
+    .textarea-wrapper .input-field label {
+        top: 1.5rem;
+        transform: none;
+    }
+
+
+    .input-field input:focus + label,
+    .input-field input:not(:placeholder-shown) + label,
+    .input-field textarea:focus + label,
+    .input-field textarea:not(:placeholder-shown) + label {
+        top: 0.1rem;
+        transform: translateY(0);
+        font-size: 0.7rem;
+        color: var(--primary-color);
+    }
+
+    .date-wrapper .input-field input {
+        padding-top: 0.875rem;
+    }
+
+    .date-wrapper .input-field label {
+        top: 0.5rem;
+        transform: translateY(0);
+        font-size: 0.7rem;
+    }
+
+    .add-item-button {
+        position: absolute;
+        right: 0;
+        top: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+        color: var(--primary-color);
+        background-color: transparent;
+        border: 1px solid var(--primary-color);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+        .add-item-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .line-items-table {
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+
+    .line-items-header {
+        display: grid;
+        grid-template-columns: 3fr 1fr 1fr 1fr 1fr 0.5fr;
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 0.75rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .line-item {
+        display: grid;
+        grid-template-columns: 3fr 1fr 1fr 1fr 1fr 0.5fr;
+        padding: 0.75rem 1rem;
+        border-top: 1px solid var(--border-light);
+        transition: var(--transition);
+    }
+
+        .line-item:hover {
+            background-color: var(--input-bg);
+        }
+
+    .item-description,
+    .item-quantity,
+    .item-unit-price,
+    .item-tax,
+    .item-total,
+    .item-actions {
+        padding: 0.25rem;
+    }
+
+    .line-total {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .remove-item-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        border: none;
+        background-color: transparent;
+        color: var(--text-muted);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+        .remove-item-button:hover {
+            color: var(--danger-color);
+            background-color: rgba(220, 38, 38, 0.1);
+        }
+
+    .invoice-summary {
+        margin-left: auto;
+        width: 300px;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-light);
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .total-row {
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--text-primary);
+        border-bottom: 2px solid var(--primary-color);
+    }
+
+    .invoice-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .cancel-button {
+        background-color: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+    }
+
+        .cancel-button:hover {
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+    .primary-button {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+        .primary-button:hover {
+            background-color: var(--success-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .invoice-section {
+        opacity: 0;
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    .company-details {
+        animation-delay: 0.1s;
+    }
+
+    .client-details {
+        animation-delay: 0.2s;
+    }
+
+    .invoice-details {
+        animation-delay: 0.3s;
+    }
+
+    .line-items {
+        animation-delay: 0.4s;
+    }
+
+    .notes-section {
+        animation-delay: 0.5s;
+    }
+
+    .invoice-actions {
+        animation-delay: 0.6s;
+    }
+
+
+
+</style>
+<div class="invoice-container">
+    <div class="invoice-header">
+        <div class="header-left">
+            <h2>Create New Invoice</h2>
+            <p class="text-muted">Complete the form below to generate a new invoice</p>
+        </div>
+    </div>
+
+    <form id="invoiceForm" asp-action="Create" asp-controller="Invoice" method="post">
+        <div class="container-fluid">
+            <div class="row gy-4">
+
+                <!-- Company Details -->
+                <div class="col-12 col-md-6">
+                    <div class="invoice-section company-details">
+                        <div class="section-header d-flex align-items-center gap-2 mb-3">
+                            <i class="bi bi-building"></i>
+                            <h3 class="m-0 fs-5">Your Company</h3>
+                        </div>
+
+                        <!-- Company Fields -->
+                        <div class="form-group mb-3">
+                            <div class="input-wrapper">
+                                <div class="input-field">
+                                    <input id="companyName" class="form-control" placeholder=" " />
+                                    <label for="companyName">Company Name</label>
+                                    <span class="text-danger small fst-italic d-block mt-1" asp-validation-for="@Model.CompanyName"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="input-wrapper">
+                                <div class="input-field">
+                                    <input id="companyAddress" class="form-control" placeholder=" " />
+                                    <label for="companyAddress">Address</label>
+                                    <span class="text-danger small fst-italic d-block mt-1" asp-validation-for="@Model.CompanyAddress"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-12 col-sm-6 mb-3">
+                                <div class="input-wrapper">
+                                    <div class="input-field">
+                                        <input id="companyPhone" class="form-control" placeholder=" " />
+                                        <label for="companyPhone">Phone</label>
+                                        <span class="text-danger small fst-italic d-block mt-1" asp-validation-for="@Model.CompanyPhone"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-12 col-sm-6 mb-3">
+                                <div class="input-wrapper">
+                                    <div class="input-field">
+                                        <input id="companyEmail" class="form-control" placeholder=" " />
+                                        <label for="companyEmail">Email</label>
+                                        <span class="text-danger small fst-italic d-block mt-1" asp-validation-for="@Model.CompanyEmail"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="input-wrapper">
+                                <div class="input-field">
+                                    <input id="companyTaxId" class="form-control" placeholder=" " />
+                                    <label for="companyTaxId">Tax ID / VAT Number</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Details -->
+                <div class="col-12 col-md-6">
+                    <div class="invoice-section client-details">
+                        <div class="section-header d-flex align-items-center gap-2 mb-3">
+                            <i class="bi bi-person"></i>
+                            <h3 class="m-0 fs-5">Client Information</h3>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="input-wrapper">
+                                <div class="input-field">
+                                    <input id="clientName" class="form-control" placeholder=" " />
+                                    <label for="clientName">Client Name</label>
+                                    <span class="text-danger small fst-italic d-block mt-1" asp-validation-for="@Model.ClientName"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="input-wrapper">
+                                <div class="input-field">
+                                    <input id="clientAddress" class="form-control" placeholder=" " />
+                                    <label for="clientAddress">Address</label>
+                                    <span class="text-danger small fst-italic d-block mt-1" asp-validation-for="@Model.ClientAddress"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-12 col-sm-6 mb-3">
+                                <div class="input-wrapper">
+                                    <div class="input-field">
+                                        <input id="clientPhone" class="form-control" placeholder=" " />
+                                        <label for="clientPhone">Phone</label>
+                                        <span class="text-danger small fst-italic d-block mt-1" asp-validation-for="@Model.ClientPhone"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-12 col-sm-6 mb-3">
+                                <div class="input-wrapper">
+                                    <div class="input-field">
+                                        <input id="clientEmail" class="form-control" placeholder=" " />
+                                        <label for="clientEmail">Email</label>
+                                        <span class="text-danger small fst-italic d-block mt-1" asp-validation-for="@Model.ClientEmail"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="input-wrapper">
+                                <div class="input-field">
+                                    <input id="clientTaxId" class="form-control" placeholder=" " />
+                                    <label for="clientTaxId">Tax ID / VAT Number</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="invoice-section invoice-details">
+            <div class="section-header d-flex align-items-center gap-2 mb-3">
+                <i class="bi bi-receipt"></i>
+                <h3 class="m-0 fs-5">Invoice Details</h3>
+            </div>
+
+            <div class="form-row row g-2">
+                <!-- Invoice Number -->
+                <div class="form-group third col-12 col-md">
+                    <div class="input-wrapper">
+                        <div class="input-field">
+                            <input disabled id="invoiceNumber" class="form-control" />
+                            <label for="invoiceNumber">Invoice Number</label>
+                            <span class="text-danger small fst-italic d-block mt-1" asp-validation-for="@Model.InvoiceNumber"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Date -->
+                <div class="form-group third col-12 col-md">
+                    <div class="input-wrapper date-wrapper">
+                        <div class="input-field">
+                            <input id="invoiceDate" type="date" placeholder=" " class="form-control" />
+                            <label for="invoiceDate">Invoice Date</label>
+                            <span class="text-danger small fst-italic d-block mt-1" asp-validation-for="@Model.IssueDate"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Due Date -->
+                <div class="form-group third col-12 col-md">
+                    <div class="input-wrapper date-wrapper">
+                        <div class="input-field">
+                            <input id="dueDate" type="date" placeholder=" " class="form-control" />
+                            <label for="dueDate">Due Date</label>
+                            <span class="text-danger small fst-italic d-block mt-1" asp-validation-for="@Model.DueDate"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="invoice-section line-items">
+            <div class="section-header">
+                <i class="bi bi-list-check"></i>
+                <h3>Line Items</h3>
+                <button type="button" id="addLineItemBtn" class="add-item-button" asp-controller="Invoice" asp-action="AddInvoiceItem">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>Add Item</span>
+                </button>
+            </div>
+
+            <div class="line-items-table">
+                <div class="line-items-header">
+                    <div class="item-description">Description</div>
+                    <div class="item-quantity">Quantity</div>
+                    <div class="item-unit-price">Unit Price</div>
+                    <div class="item-tax">Tax (%)</div>
+                    <div class="item-total">Total</div>
+                    <div class="item-actions"></div>
+                </div>
+
+                <div id="lineItemsContainer">
+
+
+                    <div class="line-item" data-index="0">
+                        <div class="item-description">
+                            <div class="input-wrapper">
+                                <div class="input-field">
+                                    <input type="text" name="LineItems[0].Description" placeholder=" " />
+                                    <label>Item Description</label>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-quantity">
+                            <div class="input-wrapper">
+                                <div class="input-field">
+                                    <input type="number" name="LineItems[0].Quantity" value="1" min="1" step="1" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-unit-price">
+                            <div class="input-wrapper">
+                                <div class="input-field">
+                                    <input type="number" name="LineItems[0].UnitPrice" value="0.00" step="0.01" />
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-tax">
+                            <div class="input-wrapper">
+                                <div class="input-field">
+                                    <input type="number" name="LineItems[0].TaxRate" value="0" min="0" max="100" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-total">
+                            <div class="line-total">$0.00</div>
+                        </div>
+                        <div class="item-actions">
+                            <button type="button" class="remove-item-button">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+         
+                </div>
+            </div>
+        </div>
+
+        <div class="invoice-summary">
+            <div class="summary-row">
+                <span>Subtotal:</span>
+                <span id="subtotalAmount">$0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax:</span>
+                <span id="taxAmount">$0.00</span>
+            </div>
+            <div class="summary-row total-row">
+                <span>Total:</span>
+                <span id="totalAmount">$0.00</span>
+            </div>
+        </div>
+
+        <div class="invoice-section notes-section">
+            <div class="section-header">
+                <i class="bi bi-pencil-square"></i>
+                <h3>Additional Notes</h3>
+            </div>
+
+            <div class="form-group">
+                <div class="input-wrapper textarea-wrapper">
+                    <div class="input-field">
+                        <textarea id="invoiceNotes" placeholder=" " rows="3"></textarea>
+                        <label for="invoiceNotes">Notes (Payment terms, instructions, etc.)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="invoice-actions">
+            <a href="/Invoice/All" class="action-button cancel-button">
+                <i class="bi bi-x-circle"></i>
+                <span>Cancel</span>
+            </a>
+            <button type="submit" class="action-button primary-button" id="create-btn">
+                <i class="bi bi-check-circle"></i>
+                <span>Create Invoice</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+        // Variables
+        let lineItemCount = 1;
+        const lineItemsContainer = document.getElementById('lineItemsContainer');
+        const addLineItemBtn = document.getElementById('addLineItemBtn');
+        const exportBtn = document.getElementById('exportInvoiceBtn');
+
+        // Add line item handler
+        addLineItemBtn.addEventListener('click', function () {
+            addLineItem();
+            calculateTotals();
+        });
+
+        // Initial calculations
+        calculateTotals();
+   
+        const invoiceInput = document.getElementById('invoiceNumber');
+
+        console.log(invoiceInput);
+        
+        if (invoiceInput && !invoiceInput.value) {
+            
+            const generatedNum = genInvoiceNum();
+            invoiceInput.placeholder = generatedNum;
+            invoiceInput.value = generatedNum;
+
+            console.log(invoiceInput.placeholder);
+            console.log(invoiceInput.value);
+        }
+
+        document.querySelector("#create-btn").addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const invoiceData = {
+                companyName: document.getElementById('companyName').value,
+                companyAddress: document.getElementById('companyAddress').value,
+                companyPhone: document.getElementById('companyPhone').value,
+                companyEmail: document.getElementById('companyEmail').value,
+                companyTaxId: document.getElementById('companyTaxId').value,
+                clientName: document.getElementById('clientName').value,
+                clientAddress: document.getElementById('clientAddress').value,
+                clientPhone: document.getElementById('clientPhone').value,
+                clientEmail: document.getElementById('clientEmail').value,
+                clientTaxId: document.getElementById('clientTaxId').value, // Fixed: separate property
+                invoiceNumber: document.getElementById('invoiceNumber').value,
+                issueDate: document.getElementById('invoiceDate').value,
+                dueDate: document.getElementById('dueDate').value,
+                invoiceListItems: [],
+                total: parseFloat(document.querySelector("#invoiceForm > div.invoice-summary > div.summary-row.total-row").children[1].textContent.replace("$", "")),
+            };
+
+            const lineItems = document.querySelectorAll(".line-item");
+
+            lineItems.forEach(item => {
+                const invoiceDataObj = {
+                    invoiceItemDescription: item.querySelector("#lineItemsContainer > div > div.item-description > div > div > input[type=text]").value,
+                    invoiceItemQuantity: parseFloat(item.querySelector("#lineItemsContainer > div > div.item-quantity > div > div > input[type=number]").value) || 0,
+                    invoiceItemUnitPrice: parseFloat(item.querySelector("#lineItemsContainer > div > div.item-unit-price > div > div > input[type=number]").value) || 0,
+                    invoiceItemTax: parseFloat(item.querySelector("#lineItemsContainer > div > div.item-tax > div > div > input[type=number]").value) || 0,
+                    invoiceItemTotal: parseFloat(item.querySelector("#lineItemsContainer > div > div.item-total > div").textContent.replace("$", "")) || 0
+            };
+                invoiceData.invoiceListItems.push(invoiceDataObj);
+            });
+
+            const stringifiedJsonData = JSON.stringify(invoiceData);
+
+            fetch("/Invoice/Create", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json'},
+                body: stringifiedJsonData,
+            })
+            .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text); });
+                    }
+                    return response.json(); // or .text() depending on what your backend returns
+                })
+                .then(data => {
+                    // ✅ Success
+                    toastr.success("Invoice created successfully");
+                    // Or redirect:
+                    window.location.href = "/Home/Index";
+                })
+                .catch(error => {
+                    // ❌ Failed
+                    console.error("Error:", error);
+                    toastr.error("Something went wrong");
+                });
+        });
+
+           function genInvoiceNum() {
+                const now = new Date();
+                const pad = (num, size) => num.toString().padStart(size, '0');
+
+                const timestamp =
+                    now.getUTCFullYear().toString() +
+                    pad(now.getUTCMonth() + 1, 2) +
+                    pad(now.getUTCDate(), 2) +
+                    pad(now.getUTCHours(), 2) +
+                    pad(now.getUTCMinutes(), 2) +
+                    pad(now.getUTCSeconds(), 2);
+
+                const rand = Math.floor(100 + Math.random() * 900);
+                return `INV-${timestamp}-${rand}`;
+                }
+
+    
+
+        // Add new line item
+        function addLineItem() {
+            const index = lineItemCount++;
+            const newLineItem = document.createElement('div');
+            newLineItem.className = 'line-item';
+            newLineItem.dataset.index = index;
+            newLineItem.style.opacity = '0';
+
+            newLineItem.innerHTML = `
+              <div class="item-description">
+                <div class="input-wrapper">
+                  <div class="input-field">
+                    <input type="text" name="LineItems[${index}].Description" placeholder=" " />
+                    <label>Item Description</label>
+                  </div>
+                </div>
+              </div>
+              <div class="item-quantity">
+                <div class="input-wrapper">
+                  <div class="input-field">
+                    <input type="number" name="LineItems[${index}].Quantity" value="1" min="1" step="1" />
+                  </div>
+                </div>
+              </div>
+              <div class="item-unit-price">
+                <div class="input-wrapper">
+                  <div class="input-field">
+                    <input type="number" name="LineItems[${index}].UnitPrice" value="0.00" step="0.01" />
+                  </div>
+                </div>
+              </div>
+              <div class="item-tax">
+                <div class="input-wrapper">
+                  <div class="input-field">
+                    <input type="number" name="LineItems[${index}].TaxRate" value="0" min="0" max="100" />
+                  </div>
+                </div>
+              </div>
+              <div class="item-total">
+                <div class="line-total">$0.00</div>
+              </div>
+              <div class="item-actions">
+                <button type="button" class="remove-item-button">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            `;
+
+            lineItemsContainer.appendChild(newLineItem);
+
+            // Add event listeners to new inputs
+            const inputs = newLineItem.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateTotals);
+
+            });
+
+            // Add event listener to remove button
+            const removeBtn = newLineItem.querySelector('.remove-item-button');
+            removeBtn.addEventListener('click', function () {
+                removeLineItem(newLineItem);
+            });
+
+            // Animate the new line item
+            setTimeout(() => {
+                newLineItem.style.opacity = '1';
+                newLineItem.style.transition = 'opacity 0.3s ease';
+            }, 10);
+        }
+
+        // Remove line item
+        function removeLineItem(lineItem) {
+            lineItem.style.opacity = '0';
+            lineItem.style.transform = 'translateX(10px)';
+            lineItem.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
+            setTimeout(() => {
+                lineItem.remove();
+                calculateTotals();
+            }, 300);
+        }
+
+        // Calculate totals
+        function calculateTotals() {
+            let subtotal = 0;
+            let totalTax = 0;
+
+            const lineItems = document.querySelectorAll('.line-item');
+            lineItems.forEach(item => {
+                const quantityInput = item.querySelector('.item-quantity input');
+                const priceInput = item.querySelector('.item-unit-price input');
+                const taxInput = item.querySelector('.item-tax input');
+                const totalElement = item.querySelector('.line-total');
+
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const price = parseFloat(priceInput.value) || 0;
+                const taxRate = parseFloat(taxInput.value) || 0;
+
+                const lineTotal = quantity * price;
+                const lineTax = lineTotal * (taxRate / 100);
+
+                subtotal += lineTotal;
+                totalTax += lineTax;
+
+                totalElement.textContent = '$' + lineTotal.toFixed(2);
+            });
+
+            const total = subtotal + totalTax;
+
+            document.getElementById('subtotalAmount').textContent = '$' + subtotal.toFixed(2);
+            document.getElementById('taxAmount').textContent = '$' + totalTax.toFixed(2);
+            document.getElementById('totalAmount').textContent = '$' + total.toFixed(2);
+        }
+
+        // Setup input event listeners for all initial inputs
+        document.querySelectorAll('.line-item input').forEach(input => {
+            input.addEventListener('input', calculateTotals);
+        });
+
+        // Setup event listener for initial remove button
+        document.querySelector('.remove-item-button').addEventListener('click', function () {
+            const lineItem = this.closest('.line-item');
+            removeLineItem(lineItem);
+        });
+
+        // Export to PDF functionality (placeholder)
+
+        // Add spinning animation for export button
+        const style = document.createElement('style');
+        style.textContent = `
+        @@keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+
+            .spin {
+              animation: spin 1s linear infinite;
+            }
+
+            .processing {
+              pointer-events: none;
+              opacity: 0.8;
+            }
+          `;
+        document.head.appendChild(style);
+    });
+
+
+</script>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

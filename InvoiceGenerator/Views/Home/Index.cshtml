@@ -1,0 +1,504 @@
+﻿@using InvoiceGenerator.InvoiceGenerator.Infrastructure.Models
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+@{
+    ViewData["Title"] = "NeoInvoice - Your Personal Invoice Assistant";
+}
+
+<div class="welcome-page mt-3">
+    <!-- Animated Background Canvas -->
+    <canvas id="animatedBackground"></canvas>
+
+    <div class="container" style="position: relative; bottom:50px;">
+        <div class="content-wrapper">
+            <!-- Logo & Header Section -->
+            <div class="header-section">
+                <div class="logo-container">
+                    <i class="bi bi-file-earmark-bar-graph logo-icon"></i>
+                </div>
+                <h1 class="app-name">NeoInvoice</h1>
+                <p class="tagline">Your personal invoice assistant – fast, secure, and hassle-free.</p>
+            </div>
+
+            <!-- Intro Text -->
+            <div class="intro-section">
+                <p>NeoInvoice is a streamlined invoice creation platform tailored for freelancers and small business owners. Generate, preview, and download invoices instantly – no setup, no fluff.</p>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="features-grid">
+                <div class="feature-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h3>Secure Storage</h3>
+                    </div>
+                </div>
+
+                <div class="feature-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h3>PDF Export</h3>
+                    </div>
+                </div>
+
+                <div class="feature-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h3>Instant Generation</h3>
+                    </div>
+                </div>
+
+                <div class="feature-item" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon">
+                        <i class="bi bi-cloud"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h3>Cloud-Based</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Button -->
+
+            @if (!SignInManager.IsSignedIn(User))
+            {
+
+                <div class="cta-section">
+                    <a asp-area="Identity" asp-page="/Account/Login" class="login-btn" id="loginButton">
+                        <span>Log In to Start</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                    <p>Create account <strong><a href="/Invoice/Create"> here</a></strong></p>
+                </div>
+            }
+            else
+            {
+                <div class="cta-section">
+                    <a asp-controller="Invoice" asp-action="Create" class="login-btn" id="loginButton">
+                        <span>Get Started</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            }
+
+
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Base Styles */
+    body {
+        font-family: 'Poppins', 'Segoe UI', Roboto, sans-serif;
+        background-color: #ffffff;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    /* Welcome Page Container */
+    .welcome-page {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    /* Animated Background */
+    #animatedBackground {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+    /* Content Container */
+    .container {
+        width: 100%;
+        max-width: 1000px;
+        z-index: 1;
+    }
+
+    .content-wrapper {
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    /* Logo and Header */
+    .header-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .logo-container {
+        margin-bottom: 1rem;
+    }
+
+    .logo-icon {
+        font-size: 3.5rem;
+        background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+
+    .app-name {
+        font-size: 3rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem;
+        background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+    }
+
+    .tagline {
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin: 0;
+        color: #555;
+    }
+
+    /* Intro Text */
+    .intro-section {
+        max-width: 700px;
+        margin-bottom: 3rem;
+    }
+
+    .intro-section p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #666;
+    }
+
+    /* Features Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        width: 100%;
+        margin-bottom: 3rem;
+    }
+
+    .feature-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1.5rem;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .feature-icon i {
+        font-size: 1.8rem;
+        color: white;
+    }
+
+    .feature-text h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+        color: #333;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .login-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.8rem 2.5rem;
+        background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+        color: white;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(58, 123, 213, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: 0.5s;
+    }
+
+    .login-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(58, 123, 213, 0.4);
+    }
+
+    .login-btn:hover::before {
+        left: 100%;
+    }
+
+    .login-btn i {
+        margin-left: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .login-btn:hover i {
+        transform: translateX(5px);
+    }
+
+    .restricted-text {
+        margin-top: 0.8rem;
+        font-size: 0.85rem;
+        color: #888;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 992px) {
+        .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .content-wrapper {
+            padding: 2rem;
+        }
+
+        .app-name {
+            font-size: 2.5rem;
+        }
+
+        .tagline {
+            font-size: 1rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .content-wrapper {
+            padding: 1.5rem;
+        }
+
+        .app-name {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<script>
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the animated background
+        initAnimatedBackground();
+        
+        // Initialize animations
+        initAnimations();
+        
+        // Add button hover effect
+        const loginButton = document.getElementById('loginButton');
+        loginButton.addEventListener('mouseover', function() {
+            this.querySelector('i').style.transform = 'translateX(5px)';
+        });
+        
+        loginButton.addEventListener('mouseout', function() {
+            this.querySelector('i').style.transform = 'translateX(0)';
+        });
+    });
+
+    // Function to initialize the animated background
+    function initAnimatedBackground() {
+        const canvas = document.getElementById('animatedBackground');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas dimensions
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // Particles array
+        const particles = [];
+        const particleCount = 100;
+        
+        // Create particles
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 5 + 1,
+                color: `rgba(58, 123, 213, ${Math.random() * 0.3})`,
+                speedX: Math.random() * 2 - 1,
+                speedY: Math.random() * 2 - 1
+            });
+        }
+        
+        // Function to draw particles
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach((particle, index) => {
+                // Move particles
+                particle.x += particle.speedX;
+                particle.y += particle.speedY;
+                
+                // Bounce off edges
+                if (particle.x < 0 || particle.x > canvas.width) {
+                    particle.speedX *= -1;
+                }
+                if (particle.y < 0 || particle.y > canvas.height) {
+                    particle.speedY *= -1;
+                }
+                
+                // Draw particle
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = particle.color;
+                ctx.fill();
+                
+                // Draw connections
+                connectParticles(particle, index);
+            });
+            
+            requestAnimationFrame(drawParticles);
+        }
+        
+        // Function to draw connections between particles
+        function connectParticles(particle, index) {
+            for (let i = index + 1; i < particles.length; i++) {
+                const dx = particle.x - particles[i].x;
+                const dy = particle.y - particles[i].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 100) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(58, 123, 213, ${0.2 * (1 - distance / 100)})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.moveTo(particle.x, particle.y);
+                    ctx.lineTo(particles[i].x, particles[i].y);
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // Start animation
+        drawParticles();
+    }
+
+    // Function to initialize animations for elements
+    function initAnimations() {
+        // Header animation
+        const header = document.querySelector('.header-section');
+        animateElement(header, 'fadeInDown', 0);
+        
+        // Intro text animation
+        const intro = document.querySelector('.intro-section');
+        animateElement(intro, 'fadeIn', 300);
+        
+        // Feature items animation
+        const features = document.querySelectorAll('.feature-item');
+        features.forEach((feature, index) => {
+            animateElement(feature, 'fadeInUp', 400 + (index * 100));
+        });
+        
+        // CTA button animation
+        const cta = document.querySelector('.cta-section');
+        animateElement(cta, 'fadeInUp', 900);
+    }
+    
+    // Helper function to animate elements with CSS
+    function animateElement(element, animationName, delay) {
+        setTimeout(() => {
+            element.style.opacity = '0';
+            element.style.animation = `${animationName} 0.8s forwards`;
+        }, delay);
+    }
+    
+    // Define animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @@keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header-section, .intro-section, .feature-item, .cta-section {
+            opacity: 0;
+        }
+    `;
+    document.head.appendChild(style);
+</script>

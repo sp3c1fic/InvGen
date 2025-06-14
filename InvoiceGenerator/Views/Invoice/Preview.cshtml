@@ -1,0 +1,103 @@
+﻿@using InvoiceGenerator.InvoiceGenerator.Core.Models
+@using InvoiceGenerator.InvoiceGenerator.Core.Models.Invoice
+@model InvoiceServiceViewModel
+
+@{
+    ViewData["Title"] = "Invoice Preview";
+}
+
+<div class="container my-4 invoice-container" style="position: relative; bottom: 25px">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4">
+        <div>
+            <h2 class="fw-bold">Invoice #@Model.InvoiceNumber</h2>
+            <p class="text-muted mb-1">Issued: @Model.IssueDate</p>
+            <p class="text-muted">Due: @Model.DueDate</p>
+        </div>
+        <div class="invoice-action-buttons d-flex flex-wrap gap-2 mt-4">
+            <!-- Download PDF -->
+            <form method="get" asp-controller="Pdf" asp-action="ExportInvoice" asp-route-id="@Model.Id">
+                <button type="submit" class="btn btn-dark btn-sm">
+                    <i class="bi bi-download me-1"></i> Download PDF
+                </button>
+            </form>
+
+            <!-- Edit Invoice -->
+            <form method="get" asp-controller="Invoice" asp-action="Edit" asp-route-id="@Model.Id">
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil-square me-1"></i> Edit
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Invoice Card -->
+    <div class="card shadow-sm p-4 bg-white">
+        <!-- Company / Client Info -->
+        <div class="row mb-4">
+            <div class="col-12 col-sm-6">
+                <h5 class="fw-semibold">From</h5>
+                <p class="mb-1">@Model.CompanyName</p>
+                <p class="mb-1">@Model.CompanyAddress</p>
+                <p class="mb-1">@Model.CompanyEmail</p>
+                <p class="mb-1">@Model.CompanyPhone</p>
+            </div>
+            <div class="col-12 col-sm-6 text-sm-end">
+                <h5 class="fw-semibold">To</h5>
+                <p class="mb-1">@Model.ClientName</p>
+                <p class="mb-1">@Model.ClientAddress</p>
+                <p class="mb-1">@Model.ClientEmail</p>
+                <p class="mb-1">@Model.ClientPhone</p>
+                
+            </div>
+        </div>
+
+        <!-- Invoice Table -->
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered align-middle small">
+                <thead class="table-light">
+                    <tr>
+                        <th>Description</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.InvoiceItems)
+                    {
+                            <tr>
+                                <td>@item.Description</td>
+                                <td class="text-end">@item.Quantity</td>
+                                <td class="text-end">&#8356;@item.Price.ToString("F2").Replace(',', '.')</td>
+                            <td class="text-end">&#8356;@($"{(item.Quantity * item.Price).ToString("F2").Replace(',', '.')}")</td>
+                            </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Summary -->
+        <div class="row justify-content-end">
+            <div class="col-12 col-md-6 col-lg-4">
+                <table class="table table-borderless small">
+                    <tr>
+                        <th>Subtotal:</th>
+                        <td class="text-end">&#8356;@Model.InvoiceItems.Sum(x => x.Total).ToString("F2").Replace(',', '.')</td>
+                    </tr>
+                    <tr>
+                        <th>Tax (20%):</th>
+                        <td class="text-end">
+                            &#8356;@(((Model.InvoiceItems.Sum(x => x.Total) * 1.2m) - Model.InvoiceItems.Sum(x => x.Total)).ToString("F2").Replace(',', '.'))
+                        </td>
+                    </tr>
+                    <tr class="fw-bold border-top">
+                        <th>Total:</th>
+                        <td class="text-end">&#8356;@Model.Total.ToString("F2").Replace(',', '.')</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
