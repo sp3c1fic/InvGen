@@ -44,9 +44,6 @@
                                 <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello <span class="fw-bolder">@User.Identity?.Name!.Split("@")[0]</span></a>
                             </li>
 
-                            if (User.Claims.First())
-
-
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Invoice" asp-action="Create">
                                     <i class="bi bi-plus-circle me-1"></i> New Invoice

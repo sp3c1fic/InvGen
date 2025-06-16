@@ -24,9 +24,11 @@
 
             <!-- Edit Invoice -->
             <form method="get" asp-controller="Invoice" asp-action="Edit" asp-route-id="@Model.Id">
-                <button type="submit" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-pencil-square me-1"></i> Edit
+                <button type="submit" class="btn btn-outline-info btn-sm shadow-sm rounded-pill px-3 d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-pencil-square"></i>
+                    <span>Edit</span>
                 </button>
+
             </form>
         </div>
     </div>

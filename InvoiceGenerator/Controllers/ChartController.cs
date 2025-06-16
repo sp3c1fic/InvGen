@@ -32,10 +32,10 @@ namespace InvoiceGenerator.Controllers
                 return BadRequest("Error fetching current user");
             }
 
-            if (user.IsPaid == false)
-            {
-                return Redirect("/Payment/Index");
-            }
+            //if (user.IsPaid == false)
+            //{
+            //    return Redirect("/Payment/Index");
+            //}
 
             var monthlyRevenue = _context.Invoices
                 .Where(i => i.Status == "unpaid")

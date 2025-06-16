@@ -7,7 +7,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-4" style="position: relative; bottom: 60px;">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
@@ -115,18 +115,12 @@
                                 <tr class="border-bottom">
                                     <td class="px-4 py-3">
                                         <a href="/Invoice/Preview/@invoice.Id"
-                                           class="fw-semibold text-decoration-none"
-                                           style="
-                                               color: #4a00e0;
-                                               background: linear-gradient(90deg, #8e2de2, #4a00e0);
-                                               -webkit-background-clip: text;
-                                               -webkit-text-fill-color: transparent;
-                                               transition: all 0.3s ease-in-out;
-           "
-                                           onmouseover="this.style.opacity='0.8'"
-                                           onmouseout="this.style.opacity='1'">
-                                            #@invoice.InvoiceNumber
+                                           class="fw-semibold text-decoration-none text-primary-emphasis link-underline-opacity-0 link-underline-opacity-75-hover">
+                                            <span class="badge bg-gradient text-uppercase fs-6 px-2 py-1 bg-primary-subtle text-primary fw-bold">
+                                                #@invoice.InvoiceNumber
+                                            </span>
                                         </a>
+
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="d-flex align-items-center">
@@ -144,10 +138,10 @@
                                         @invoice.DueDate
                                     </td>
                                     <td class="px-4 py-3 text-end">
-                                        <span class="fw-semibold text-dark">€@invoice.Total.ToString("N2")</span>
+                                        <span class="fw-semibold text-dark">&#8356;@invoice.Total.ToString("N2")</span>
                                     </td>
                                     <td class="px-4 py-3 text-end">
-                                        <span class="fw-semibold text-dark">€@invoice.Status</span>
+                                        <span class="fw-semibold text-dark">@invoice.Status.ToUpper()</span>
                                     </td>
                                     <td class="px-4 py-3 text-center">
                                         <div class="dropdown">

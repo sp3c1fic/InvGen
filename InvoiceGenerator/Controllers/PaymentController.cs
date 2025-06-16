@@ -9,7 +9,7 @@ namespace InvoiceGenerator.Controllers
             return View();
         }
 
-        public void MakePayment()
+        public void MakePayment(string id)
         {
 
         }
